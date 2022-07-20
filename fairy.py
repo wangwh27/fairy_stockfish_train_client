@@ -22,7 +22,7 @@ def generate_data(threads=-1):
         os.remove(FILE_NAME)
     while os.path.exists(FILE_NAME):
         time.sleep(0.1)
-    exe_file = "fairy.exe" if os.name == "nt" else "fairy"
+    exe_file = "fairy.exe" if os.name == "nt" else "./fairy"
     if os.name != "nt":
         os.system("chmod +x " + exe_file)
     fairy = subprocess.Popen([exe_file], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
