@@ -1,5 +1,3 @@
-import sys
-import torch
 import pickle
 import requests
 import time
