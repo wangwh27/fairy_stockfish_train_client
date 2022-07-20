@@ -11,7 +11,7 @@ setoption name Use NNUE value pure
 setoption name EvalFile value ./xiangqi-weights.nnue
 setoption name Threads value [Threads]
 setoption name Hash value 1024
-generate_training_data depth 9 count 10000 random_multi_pv 4 random_multi_pv_diff 100 random_move_count 8 random_move_max_ply 20 write_min_ply 5 eval_limit 10000 set_recommended_uci_options data_format bin output_file_name {FILE_NAME}
+generate_training_data depth 9 count 10000 book xiangqi-book.epd random_multi_pv 4 random_multi_pv_diff 100 random_move_count 8 random_move_max_ply 20 write_min_ply 5 eval_limit 10000 set_recommended_uci_options data_format bin output_file_name {FILE_NAME}
 """
 
 
