@@ -18,7 +18,7 @@ data_total = 0
 start_time = time.time()
 
 
-def upload_data(data, version, user):
+def upload_data(data, version, user, gen_params):
     print("正在压缩棋谱，原始大小为", round(len(data) / 1024), "KB")
     data = gzip.compress(data)
     tryCount = 2
@@ -27,7 +27,7 @@ def upload_data(data, version, user):
     try:
         try:
             upload_start_time = time.time()
-            rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}",
+            rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&params={gen_params}&user={user}",
                                 files={"file": data}, timeout=90)
             print("上传棋谱耗时", round(time.time() - upload_start_time, 2), "秒")
         except TimeoutError:
@@ -38,7 +38,7 @@ def upload_data(data, version, user):
             print("传输失败，重试中")
             try:
                 upload_start_time = time.time()
-                rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}",
+                rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&params={gen_params}&user={user}",
                                     files={"file": data}, timeout=90)
                 print("上传棋谱耗时", round(time.time() - upload_start_time, 2), "秒")
             except TimeoutError:

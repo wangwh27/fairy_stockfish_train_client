@@ -37,6 +37,9 @@ param_keys_map = {
 }
 
 
+param_keys_map_rev = {v: k for k, v in param_keys_map.items()}
+
+
 def params_decompress(params_compressed):
     new_params = {}
     for k, v in params_compressed.items():
@@ -45,6 +48,20 @@ def params_decompress(params_compressed):
         else:
             new_params[k] = v
     return new_params
+
+
+def params_compress(params):
+    new_params = {}
+    for k, v in params.items():
+        if k in param_keys_map_rev:
+            new_params[param_keys_map_rev[k]] = v
+        else:
+            new_params[k] = v
+    return new_params
+
+
+def params_to_str(params):
+    return "*".join([f"{k}-{v}" for k, v in params.items()])
 
 
 def check_update():
@@ -94,7 +111,8 @@ def update_book(urls):
 def upload_data():
     global generation_params
     with open(FILE_NAME_UPLOAD, "rb") as f:
-        result = client_helper.upload_data(f.read(), model_version, Args.user)
+        result = client_helper.upload_data(f.read(), model_version, Args.user,
+                                           params_to_str(params_compress(generation_params)))
         if "params" in result:
             generation_params = params_decompress(result["params"])
         if result[1] == "客户端版本不正确":
