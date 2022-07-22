@@ -5,17 +5,39 @@ import subprocess
 import multiprocessing as mp
 
 FILE_NAME = "xiangqi.bin"
-params = f"""
-setoption name UCI_Variant value xiangqi
+
+
+test_params = {
+    "depth": 4,
+    "eval_limit": 3000,
+    "eval_diff_limit": 500,
+    "random_move_min_ply": 1,
+    "random_move_max_ply": 3,
+    "random_move_count": 8,
+    "random_multi_pv": 4,
+    "random_multi_pv_diff": 100,
+    "random_multi_pv_depth": 4,
+    "write_min_ply": 1,
+    "write_max_ply": 400,
+}
+
+
+def get_generation_command(data_count, threads, output_file, generation_params):
+    params = f"""setoption name UCI_Variant value xiangqi
 setoption name Use NNUE value pure
 setoption name EvalFile value ./xiangqi-weights.nnue
-setoption name Threads value [Threads]
+setoption name Threads value {threads}
 setoption name Hash value 2048
-generate_training_data depth 9 count 10000 book xiangqi-book.epd random_multi_pv 4 random_multi_pv_diff 100 random_move_count 8 random_move_max_ply 20 write_min_ply 5 eval_limit 10000 set_recommended_uci_options data_format bin output_file_name {FILE_NAME}
 """
+    gen_params_str = ""
+    for k, v in generation_params.items():
+        gen_params_str += f"{k} {v} "
+    cmd = f"generate_training_data count {data_count} book xiangqi-book.epd {gen_params_str}" \
+          f"set_recommended_uci_options data_format bin output_file_name {output_file}\n"
+    return params + cmd
 
 
-def generate_data(threads=-1):
+def generate_data(params, threads=-1, amount=10000):
     if threads < 1:
         threads = mp.cpu_count()
     if os.path.exists(FILE_NAME):
@@ -26,9 +48,10 @@ def generate_data(threads=-1):
     if os.name != "nt":
         os.system("chmod +x " + exe_file)
     fairy = subprocess.Popen([exe_file], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    tmp_params = params.replace("[Threads]", str(threads))
+    tmp_params = get_generation_command(amount, threads, FILE_NAME, params)
     fairy.stdin.write(tmp_params.encode())
     fairy.stdin.flush()
+    fairy.stdout.flush()
     output = fairy.stdout.readline()
     while output:
         output = output.decode("utf-8").replace("\r\n", "")
@@ -39,10 +62,11 @@ def generate_data(threads=-1):
             time.sleep(1)
             fairy.terminate()
             break
+        fairy.stdout.flush()
         output = fairy.stdout.readline()
     while not os.path.exists(FILE_NAME):
         time.sleep(0.1)
 
 
 if __name__ == "__main__":
-    generate_data()
+    generate_data(test_params, threads=4, amount=5000)

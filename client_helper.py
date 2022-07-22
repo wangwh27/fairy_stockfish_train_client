@@ -1,4 +1,6 @@
 import pickle
+import random
+
 import requests
 import time
 import json
@@ -6,11 +8,11 @@ import hashlib
 import traceback
 import gzip
 import client
+
 debug = False
 HOST = "http://mc.vcccz.com:15001"
 if debug:
     HOST = "http://127.0.0.1:5001"
-
 
 data_total = 0
 start_time = time.time()
@@ -25,7 +27,8 @@ def upload_data(data, version, user):
     try:
         try:
             upload_start_time = time.time()
-            rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}" , files={"file": data}, timeout=90)
+            rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}",
+                                files={"file": data}, timeout=90)
             print("上传棋谱耗时", round(time.time() - upload_start_time, 2), "秒")
         except TimeoutError:
             rep = None
@@ -35,7 +38,8 @@ def upload_data(data, version, user):
             print("传输失败，重试中")
             try:
                 upload_start_time = time.time()
-                rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}" , files={"file": data}, timeout=90)
+                rep = requests.post(HOST + f"/upload_batch?m_ver={version}&p_ver={client.program_version}&user={user}",
+                                    files={"file": data}, timeout=90)
                 print("上传棋谱耗时", round(time.time() - upload_start_time, 2), "秒")
             except TimeoutError:
                 rep = None
@@ -72,7 +76,10 @@ def get_model_info():
 
 def download_obj(url):
     req = requests.get(url)
-    return req.content
+    if req.status_code == 200:
+        return req.content
+    else:
+        raise Exception("下载失败: " + str(req.status_code) + req.text)
 
 
 def download_pkl(url):
@@ -84,6 +91,35 @@ def download_pkl(url):
 
 
 def download_file(url, save_path):
-    data = download_obj(url)
-    with open(save_path, "wb") as f:
-        f.write(data)
+    try:
+        data = download_obj(url)
+        with open(save_path, "wb") as f:
+            f.write(data)
+        return True
+    except Exception as e:
+        print("下载文件失败:", repr(e))
+        return False
+
+
+def download_file_retry(url, save_path, retry_count=3):
+    for i in range(retry_count):
+        if download_file(url, save_path):
+            return True
+        print("下载失败，重试中")
+        time.sleep(1)
+    return False
+
+
+def download_file_multiurl_retry(urls, save_path, retry_count=3):
+    tmp_urls = urls.copy()
+    for i in range(retry_count):
+        url = random.choice(tmp_urls)
+        if download_file(url, save_path):
+            return True
+        print("下载失败，重试中")
+        if len(tmp_urls) > 1:
+            tmp_urls.remove(url)
+        else:
+            tmp_urls = urls
+        time.sleep(1)
+    return False
