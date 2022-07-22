@@ -54,8 +54,10 @@ def upload_data(data, version, user):
                         print(ret["msg"])
                 if "model_info" in ret:
                     return ret["model_info"]["weight_version"], ret["model_info"]["urls"]
+                elif "msg" in ret:
+                    return -1, ret["msg"]
                 else:
-                    return -1, []
+                    return -1, ""
             except json.JSONDecodeError:
                 print("Json Decode Error")
     except Exception as e:

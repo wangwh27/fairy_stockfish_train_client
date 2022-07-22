@@ -51,10 +51,12 @@ def check_update():
     global generation_params
     info = client_helper.get_model_info()
     while info is None:
-        print("获取模型版本失败")
+        print("获取版本失败")
         time.sleep(1)
         info = client_helper.get_model_info()
-    print(info)
+    if program_version != info["program_version"]:
+        print(f"发现新版本客户端: {info['program_version']}，请更新客户端！")
+        sys.exit(1)
     generation_params = params_decompress(info["params"])
     update_book(info["book_urls"])
     update_model(info["weight_version"], info["urls"])
@@ -95,6 +97,9 @@ def upload_data():
         result = client_helper.upload_data(f.read(), model_version, Args.user)
         if "params" in result:
             generation_params = params_decompress(result["params"])
+        if result[1] == "客户端版本不正确":
+            print("客户端版本不正确，请更新客户端")
+            sys.exit(1)
     shutil.rmtree(FILE_NAME_UPLOAD, ignore_errors=True)
     update_model(result[0], result[1])
 
