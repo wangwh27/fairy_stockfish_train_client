@@ -111,7 +111,7 @@ def update_book(urls):
 
 
 def upload_data():
-    global generation_params
+    global generation_params, NEED_EXIT
     with open(FILE_NAME_UPLOAD, "rb") as f:
         result = client_helper.upload_data(f.read(), model_version, Args.user,
                                            params_to_str(params_compress(generation_params)))
@@ -119,6 +119,7 @@ def upload_data():
             generation_params = params_decompress(result["params"])
         if result[1] == "客户端版本不正确":
             print("客户端版本不正确，请更新客户端")
+            NEED_EXIT = True
             sys.exit(1)
     shutil.rmtree(FILE_NAME_UPLOAD, ignore_errors=True)
     update_model(result[0], result[1])
