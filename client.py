@@ -21,6 +21,7 @@ parser.add_argument("--user", default="VinXiangQi", type=str, help="用于统计
 parser.add_argument("--threads", default=-1, type=int, help="用于跑谱的核心数")
 Args = parser.parse_args()
 generation_params = {}
+NEED_EXIT = False
 
 param_keys_map = {
     "d": "depth",
@@ -65,7 +66,7 @@ def params_to_str(params):
 
 
 def check_update():
-    global generation_params
+    global generation_params, NEED_EXIT
     info = client_helper.get_model_info()
     while info is None:
         print("获取版本失败")
@@ -73,6 +74,7 @@ def check_update():
         info = client_helper.get_model_info()
     if program_version != info["program_version"]:
         print(f"发现新版本客户端: {info['program_version']}，请更新客户端！")
+        NEED_EXIT = True
         sys.exit(1)
     generation_params = params_decompress(info["params"])
     update_book(info["book_urls"])
@@ -128,6 +130,8 @@ if __name__ == "__main__":
     print("-----------------------------------")
     check_update()
     while True:
+        if NEED_EXIT:
+            sys.exit(0)
         try:
             print("开始生成棋谱，该过程耗时较长，请耐心等待……")
             start_time = time.time()
