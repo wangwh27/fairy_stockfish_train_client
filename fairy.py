@@ -24,7 +24,7 @@ test_params = {
 
 def get_generation_command(data_count, threads, output_file, generation_params):
     params = f"""setoption name UCI_Variant value xiangqi
-setoption name Use NNUE value pure
+setoption name Use NNUE value true
 setoption name EvalFile value ./xiangqi-weights.nnue
 setoption name Threads value {threads}
 setoption name Hash value 2048

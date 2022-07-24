@@ -12,7 +12,7 @@ import argparse
 
 FILE_NAME = "xiangqi.bin"
 FILE_NAME_UPLOAD = "xiangqi-upload.bin"
-program_version = "1.1"
+program_version = "1.2"
 model_version = -1
 Debug = False
 generate_amount = 10000
