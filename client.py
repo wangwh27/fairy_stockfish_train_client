@@ -140,8 +140,8 @@ if __name__ == "__main__":
             time_cost = time.time() - start_time
             speed = generate_amount / time_cost
             generate_amount = int(120 * speed)
-            generate_amount = (generate_amount // 10000) * 10000
-            generate_amount = max(generate_amount, 10000)
+            generate_amount = (generate_amount // 2000) * 2000
+            generate_amount = max(generate_amount, 2000)
             print("生成完成！耗时: {0}s, 下次生成预计生成 {1} 棋谱".format(round(time_cost, 1), generate_amount))
             if not os.path.exists(FILE_NAME):
                 print("棋谱文件不存在，上传失败！")
