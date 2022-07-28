@@ -53,17 +53,15 @@ def upload_data(data, version, user, gen_params):
                     if "msg" in ret:
                         print(ret["msg"])
                 if "model_info" in ret:
-                    return ret["model_info"]["weight_version"], ret["model_info"]["urls"]
-                elif "msg" in ret:
-                    return -1, ret["msg"]
+                    return ret
                 else:
-                    return -1, ""
+                    return None
             except json.JSONDecodeError:
                 print("Json Decode Error")
     except Exception as e:
         print("棋谱传送失败:", repr(e))
 
-    return version, ""
+    return None
 
 
 def get_model_info():

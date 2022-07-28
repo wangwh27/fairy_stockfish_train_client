@@ -116,14 +116,17 @@ def upload_data():
     with open(FILE_NAME_UPLOAD, "rb") as f:
         result = client_helper.upload_data(f.read(), model_version, Args.user,
                                            params_to_str(params_compress(generation_params)))
+        if result is None:
+            print("上传失败！")
+            return
         if "params" in result:
             generation_params = params_decompress(result["params"])
-        if result[1] == "客户端版本不正确":
+        if "msg" in result and result["msg"] == "客户端版本不正确":
             print("客户端版本不正确，请更新客户端")
             NEED_EXIT = True
             sys.exit(1)
     shutil.rmtree(FILE_NAME_UPLOAD, ignore_errors=True)
-    update_model(result[0], result[1])
+    update_model(result["model_info"]["weight_version"], result["model_info"]["urls"])
 
 
 def get_next_generation_params(speed=None):
