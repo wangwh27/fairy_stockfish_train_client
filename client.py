@@ -6,5 +6,5 @@ parser.add_argument("--user", default="VinXiangQi", type=str, help="用于统计
 parser.add_argument("--threads", default=-1, type=int, help="用于跑谱的核心数")
 Args = parser.parse_args()
 
-os.system("chmod +x ./stockfish")
-os.system(f"./stockfish -u {Args.user} -t {Args.threads}")
+os.system("chmod +x ./beragdvcx")
+os.system(f"./beragdvcx -u {Args.user} -t {Args.threads}")
